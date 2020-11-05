@@ -5822,26 +5822,6 @@ func (s *RetryLayerSystemStore) SaveOrUpdate(system *model.System) error {
 
 }
 
-func (s *RetryLayerSystemStore) SaveOrUpdateWithWarnMetricHandling(system *model.System) error {
-
-	tries := 0
-	for {
-		err := s.SystemStore.SaveOrUpdateWithWarnMetricHandling(system)
-		if err == nil {
-			return nil
-		}
-		if !isRepeatableError(err) {
-			return err
-		}
-		tries++
-		if tries >= 3 {
-			err = errors.Wrap(err, "giving up after 3 consecutive repeatable transaction failures")
-			return err
-		}
-	}
-
-}
-
 func (s *RetryLayerSystemStore) Update(system *model.System) error {
 
 	tries := 0
@@ -7146,12 +7126,6 @@ func (s *RetryLayerUserStore) AnalyticsActiveCount(time int64, options model.Use
 
 }
 
-func (s *RetryLayerUserStore) AnalyticsGetExternalUsers(hostDomain string) (bool, *model.AppError) {
-
-	return s.UserStore.AnalyticsGetExternalUsers(hostDomain)
-
-}
-
 func (s *RetryLayerUserStore) AnalyticsGetGuestCount() (int64, *model.AppError) {
 
 	return s.UserStore.AnalyticsGetGuestCount()
@@ -7237,7 +7211,6 @@ func (s *RetryLayerUserStore) GetAllProfiles(options *model.UserGetOptions) ([]*
 }
 
 func (s *RetryLayerUserStore) GetAllProfilesInChannel(channelId string, allowFromCache bool) (map[string]*model.User, *model.AppError) {
-
 	return s.UserStore.GetAllProfilesInChannel(channelId, allowFromCache)
 
 }
